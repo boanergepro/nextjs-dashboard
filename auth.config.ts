@@ -1,0 +1,24 @@
+import type { NextAuthConfig } from 'next-auth';
+ 
+export const authConfig = {
+  pages: {
+    signIn: '/login',
+  },
+  // middlewares para proteger rutas
+  callbacks: {
+    authorized({ auth, request: { nextUrl }}) {
+        const isLoggedIn = !!auth?.user;
+        const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
+
+        if (isOnDashboard) {
+            if (isLoggedIn) return true;
+            return false; // redirecciona al login
+        } else if (isLoggedIn) {
+            return Response.redirect(new URL('/dashboard', nextUrl));
+        }
+
+        return true;
+    }
+  },
+  providers: [],
+} satisfies NextAuthConfig;
